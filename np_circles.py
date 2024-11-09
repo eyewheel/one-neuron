@@ -11,16 +11,27 @@ indices = np.indices(space_2d.shape)
 idx_x, idx_y = indices
 
 # distance from center
-dist_x = idx_x - x
-dist_y = idx_y - y
+dist_x = np.absolute(idx_x - x)
+dist_y = np.absolute(idx_y - y)
 
-index_mask = np.sqrt(dist_x ** 2 + dist_y ** 2)
+dist_euclid = np.sqrt(dist_x ** 2 + dist_y ** 2)
 
-print(index_mask.astype(np.int64))
+dist_taxicab = dist_x + dist_y
+dist_chebyshev = np.maximum(dist_x, dist_y)
 
-circle = np.where(index_mask < radius)
+print("euclidean:")
+print(dist_euclid.astype(np.int64))
+
+print("taxicab:")
+print(dist_taxicab.astype(np.int64))
+
+print("chebyshev:")
+print(dist_chebyshev.astype(np.int64))
+
+circle = np.where(dist_euclid < radius)
 
 space_2d[circle] = 1
 
+print(f"circle r = {radius}:")
 print(space_2d)
 
