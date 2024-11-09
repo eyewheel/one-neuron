@@ -1,23 +1,29 @@
-# drawing circles and 100-dimensional hyperspheres with numpy
+# drawing circles and high-dimensional hyperspheres with numpy
 import numpy as np
+import sys
 
-space_2d = np.zeros([13, 13])
+# never truncate high-d arrays
+np.set_printoptions(threshold=sys.maxsize)
+
+dimensionality = 3
+dim = np.zeros(dimensionality, dtype=np.int64) + 13 # length-n array of 13s 
+space = np.zeros(dim)
 
 # we start at the center of the circle, right?
-x, y = 6, 6
+center = 6 # in any dimension
 radius = 4
 
-indices = np.indices(space_2d.shape)
-idx_x, idx_y = indices
+indices = np.indices(space.shape)
 
 # distance from center
-dist_x = np.absolute(idx_x - x)
-dist_y = np.absolute(idx_y - y)
+dist = np.absolute(indices - center)
 
-dist_euclid = np.sqrt(dist_x ** 2 + dist_y ** 2)
+squares = dist ** 2
+print(squares)
+dist_euclid = np.sqrt(np.sum(squares, axis=0))
 
-dist_taxicab = dist_x + dist_y
-dist_chebyshev = np.maximum(dist_x, dist_y)
+dist_taxicab = np.sum(dist, axis=0)
+dist_chebyshev = np.maximum.reduce(dist)
 
 print("euclidean:")
 print(dist_euclid.astype(np.int64))
@@ -30,8 +36,10 @@ print(dist_chebyshev.astype(np.int64))
 
 circle = np.where(dist_euclid < radius)
 
-space_2d[circle] = 1
+space[circle] = 1
 
 print(f"circle r = {radius}:")
-print(space_2d)
+print(space)
+
+
 
