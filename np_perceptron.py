@@ -15,6 +15,11 @@ def perceptron(inputs, weights):
 def calc_weighted(inputs, weights):
     return np.dot(inputs, weights)
 
+# the classic intuition for the dot product is the similarity between two
+# vectors. this still applies here, as the inputs are "similar" to the weights
+# when large-valued inputs have large-valued weights, creating a larger
+# similarity score.
+
 """
 def perceptron(inputs, weights):
     if calc_weighted(inputs, weights) > 0:
@@ -59,5 +64,24 @@ dots = np.matmul(weights, inputs)
 
 outputs = np_sigmoid(dots)
 
-print(outputs)
+def run_layer(inputs, weights):
+    if (weights.shape[1] != inputs.shape[0]):
+        raise "weights must have same width as inputs"
+    raw_outputs = np.matmul(weights, inputs)
+    return np_sigmoid(raw_outputs)
 
+run_layer(inputs, weights)
+
+# when making the perceptron multi-layered,
+# we want to feed outputs to inputs. each layer can have a different number
+# of neurons; the neurons of each layer should have 
+# (current_layer - 1).neuron_count inputs
+# Let's define the layers as a vector where layers[0] returns the number of
+# neurons in that layer
+# for each layer, instantiate N neurons with previous_layer.N inputs
+
+layers = np.array([2, 3, 2])
+
+# wait, it would have to be a jagged array
+
+# note it still learns nothing
