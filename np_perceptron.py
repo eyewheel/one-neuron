@@ -86,15 +86,13 @@ layers = np.array([2, 3, 2])
 
 # note it still learns nothing
 
-# single layered
-class WeightUpdatingAdaline:
+class Perceptron:
     def __init__(self, input_dim):
-        self.neuron_count = 2
         self.learning_rate = 0.1
-        self.weights = np.random.rand(neuron_count, input_dim)
+        self.weights = np.random.rand(input_dim)
 
     def activation(self, z):
-        return self.np_sigmoid(z) # could replace this with whatever
+        return int(z > 0.5)
     
     def np_sigmoid(self, z):
         return 1 / (1 + np.exp(-z))
@@ -103,22 +101,20 @@ class WeightUpdatingAdaline:
         actual = self.classify(self.raw_outputs(inputs))
         print(f"inputs: {inputs}")
         print(f"output: {actual}")
-        loss = self.mse(expected, actual)
+        loss = self.loss(expected, actual)
         # learning_rate * input * error
         self.weights += self.learning_rate * inputs * loss
 
-    def mse(self, expected, actual):
-        return (expected - actual) ** 2
+    def loss(self, expected, actual):
+        return (expected - actual)
 
     def raw_outputs(self, inputs):
-        if (self.weights.shape[1] != inputs.shape[0]):
-            raise "weights must have same width as inputs"
-        return np.matmul(self.weights, inputs)
+        return np.dot(self.weights, inputs)
 
     def classify(self, inputs):
-        return np.sum(self.activation(self.raw_outputs(inputs)))
+        return self.activation(np.sum(self.raw_outputs(inputs)))
 
-neuron = WeightUpdatingAdaline(2)
+neuron = Perceptron(2)
 
 # logical AND
 
@@ -127,5 +123,7 @@ for i in range(10):
     neuron.train(np.array([1, 1]), 1)
     neuron.train(np.array([0, 0]), 0)
     neuron.train(np.array([1, 0]), 0)
-
     neuron.train(np.array([0, 0]), 0)
+    neuron.train(np.array([0, 0]), 0)
+
+
