@@ -29,7 +29,10 @@ class PerceptronNeuron:
 
 class PerceptronLayer:
     def __init__(self, size, neurons, biases):
-        self.weights = np.random.rand(size + 1, neurons)
+        # each column is a neuron
+        self.weights = np.random.rand(size, neurons)
+        print(self.weights)
+        self.size = size
         # biases should be a vector (neurons,)
         if biases.shape[0] is not neurons:
             raise ValueError("must have 1 bias per neuron")
@@ -37,18 +40,16 @@ class PerceptronLayer:
         self.learning_rate = 0.2
 
     def classify(self, inputs):
-        inputs = self.with_bias(inputs)
-        print(inputs)
-        # run activation on the dot product of the inputs with each neuron
-        return self.activation(np.matmul(self.weights, inputs))
+        # inputs should be a matrix of size (n, size)
+        if (inputs.shape[1] != self.size):
+            raise ValueError(f"input vectors must have dimension {size}")
 
-    def with_bias(self, inputs):
-        # turn inputs into a matrix stack of itself, one input per neuron
-        broadcaster = np.ones((self.weights.shape[0], 1))
-        inputs = broadcaster * inputs
-        # append biases as the last column
-        inputs = np.hstack((inputs, self.biases))
-        return inputs
+        # this is a matrix where each row is the output for all the neurons
+        # for a given input
+        # these rows can then be compared to an output pattern
+        raw_output = np.matmul(inputs, self.weights)
+        activations = self.activation(raw_output)
+        return activations
 
     def activation(self, results):
         return np.where(results > 0, 1, 0)
@@ -57,16 +58,21 @@ class PerceptronLayer:
         return expected - actual
 
     def train(self, inputs, expected):
-        actual = self.classify(inputs)
-        inputs = self.with_bias(inputs)
-        loss = self.loss(expected, actual)
-        # numpy broadcasting will create a matrix where each row is the
-        # loss across inputs for a given neuron.
-        update_weights = (loss * inputs)
-        self.weights += update_weights
+        # expected should be a vector of size (neurons,)
+        # turn it into (neurons, 1)
+        expected = expected.reshape(-1, 1)
+        
+        # subtracting a matrix from a vector
+        # works because broadcasting turns expected into a matrix "stack"
+        loss = self.loss(expected, self.classify(inputs))
+
+        # should be, for each element of the loss matrix, 
+        # multiply it by its relevant input vector and add it to its relevant
+        # weight
+        weights_update = self.learning_rate * np.matmul(np.transpose(inputs), loss)
+        self.weights += weights_update 
 
 p = PerceptronLayer(2, 3, np.zeros(3))
 
-print(p.classify(np.array([1, 1])))
 
 
