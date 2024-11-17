@@ -30,7 +30,6 @@ class PerceptronNeuron:
 class Perceptron:
     def __init__(self, size, neurons, threshold):
         self.weights = np.random.rand(neurons, size)
-        print(self.weights)
         self.threshold = threshold
         self.learning_rate = 0.2
 
